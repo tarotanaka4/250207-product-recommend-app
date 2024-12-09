@@ -19,7 +19,7 @@ st.markdown('## 対話型商品レコメンド生成AIアプリ')
 
 with st.chat_message("assistant", avatar="images/f_f_object_174_s512_f_object_174_2bg.png"):
     # st.markdown("こちらは対話型で商品レコメンドを行う生成AIチャットボットです。条件検索とチャットを活用し「こんな商品が欲しい」といった情報を入力すれば、生成AIがあなたに合った商品をレコメンドします。")
-    st.markdown("生成AIがあなたに合った商品をレコメンドします！「こんな商品が欲しい」といった情報・要望をぜひお聞かせください！")
+    st.markdown("私（生成AI）があなたに合った商品をレコメンドします！「こんな商品が欲しい」といった情報・要望をぜひお聞かせください！")
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
