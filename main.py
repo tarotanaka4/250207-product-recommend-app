@@ -34,6 +34,8 @@ for message in st.session_state.messages:
         with st.chat_message("assistant", avatar="images/f_f_object_174_s512_f_object_174_2bg.png"):
             product = message["content"]
             try:
+                name = product['name'] # わざと例外を発生させるために暫定対応
+                st.markdown(product["message"])
                 st.info(f"""{product['name']}\n
                         価格：{product['price']}""")
                 st.image(f"images/{product['image_file_name']}")
@@ -74,7 +76,8 @@ if chat_message:
                 product = ""
             
             if product:
-                st.markdown("以下の商品をご提案いたします。")
+                product["message"] = "以下の商品をご提案いたします。"
+                st.markdown(product["message"])
                 st.info(f"""{product['name']}\n
                         価格：{product['price']}""")
                 st.image(f"images/{product['image_file_name']}")
