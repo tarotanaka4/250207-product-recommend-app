@@ -17,6 +17,10 @@ import constants as ct
 ############################################################
 # 設定関連
 ############################################################
+st.set_page_config(
+    page_title=ct.APP_NAME
+)
+
 load_dotenv()
 
 logger = logging.getLogger(ct.LOGGER_NAME)
@@ -29,7 +33,7 @@ try:
     initialize()
 except Exception as e:
     logger.error(f"{ct.INITIALIZE_ERROR_MESSAGE}\n{e}")
-    st.error(utils.build_error_message(ct.INITIALIZE_ERROR_MESSAGE))
+    st.error(utils.build_error_message(ct.INITIALIZE_ERROR_MESSAGE), icon=ct.ERROR_ICON)
     st.stop()
 
 # アプリ起動時のログ出力
@@ -55,7 +59,7 @@ try:
     cn.display_conversation_log()
 except Exception as e:
     logger.error(f"{ct.CONVERSATION_LOG_ERROR_MESSAGE}\n{e}")
-    st.error(utils.build_error_message(ct.CONVERSATION_LOG_ERROR_MESSAGE))
+    st.error(utils.build_error_message(ct.CONVERSATION_LOG_ERROR_MESSAGE), icon=ct.ERROR_ICON)
     st.stop()
 
 
@@ -86,7 +90,7 @@ if chat_message:
             result = st.session_state.retriever.invoke(chat_message)
         except Exception as e:
             logger.error(f"{ct.RECOMMEND_ERROR_MESSAGE}\n{e}")
-            st.error(utils.build_error_message(ct.RECOMMEND_ERROR_MESSAGE))
+            st.error(utils.build_error_message(ct.RECOMMEND_ERROR_MESSAGE), icon=ct.ERROR_ICON)
             st.stop()
     
     # ==========================================
@@ -99,7 +103,7 @@ if chat_message:
             logger.info({"message": result})
         except Exception as e:
             logger.error(f"{ct.LLM_RESPONSE_DISP_ERROR_MESSAGE}\n{e}")
-            st.error(utils.build_error_message(ct.LLM_RESPONSE_DISP_ERROR_MESSAGE))
+            st.error(utils.build_error_message(ct.LLM_RESPONSE_DISP_ERROR_MESSAGE), icon=ct.ERROR_ICON)
             st.stop()
 
     # ==========================================

@@ -12,6 +12,7 @@
 APP_NAME = "対話型商品レコメンド生成AIアプリ"
 USER_ICON_FILE_PATH = "./images/user_icon.jpg"
 AI_ICON_FILE_PATH = "./images/ai_icon.jpg"
+ERROR_ICON = ":material/error:"
 CHAT_INPUT_HELPER_TEXT = "例： 防水機能のあるカメラ"
 SPINNER_TEXT = "レコメンドする商品の検討中..."
 

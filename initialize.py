@@ -34,10 +34,6 @@ def initialize():
     """
     画面読み込み時に実行する初期化処理
     """
-    st.set_page_config(
-        page_title=ct.APP_NAME
-    )
-
     # 初期化データの用意
     initialize_session_state()
     # ログ出力用にセッションIDを生成
