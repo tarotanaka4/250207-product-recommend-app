@@ -48,6 +48,8 @@ def initialize_logger():
     """
     ログ出力の設定
     """
+    os.makedirs(ct.LOG_DIR_PATH, exist_ok=True)
+
     logger = logging.getLogger(ct.LOGGER_NAME)
 
     if logger.hasHandlers():
@@ -85,8 +87,6 @@ def initialize_retriever():
     """
     Retrieverを作成
     """
-    os.makedirs(ct.LOG_DIR_PATH, exist_ok=True)
-    
     logger = logging.getLogger(ct.LOGGER_NAME)
 
     if "retriever" in st.session_state:
