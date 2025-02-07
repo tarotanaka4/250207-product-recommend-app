@@ -30,7 +30,7 @@ def display_initial_ai_message():
         st.markdown("**入力例**")
         st.info("""
         - 「長時間使える、高音質なワイヤレスイヤホン」
-        - 「折りたたみ式のテーブル」
+        - 「机のライト」
         - 「USBで充電できる加湿器」
         """)
 
