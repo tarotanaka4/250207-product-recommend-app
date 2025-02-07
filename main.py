@@ -1,67 +1,109 @@
-import streamlit as st
+"""
+このファイルは、Webアプリのメイン処理が記述されたファイルです。
+"""
+
+############################################################
+# ライブラリの読み込み
+############################################################
 from dotenv import load_dotenv
-from langchain.prompts import (
-    ChatPromptTemplate,
-    HumanMessagePromptTemplate,
-    MessagesPlaceholder
-)
-from langchain.schema import HumanMessage, AIMessage
-import functions as ft
+import logging
+import streamlit as st
+import utils
+from initialize import initialize
+import components as cn
 import constants as ct
 
-# 各種設定
+
+############################################################
+# 設定関連
+############################################################
 load_dotenv()
-st.set_page_config(
-    page_title=ct.APP_NAME
-)
 
+logger = logging.getLogger(ct.LOGGER_NAME)
+
+
+############################################################
+# 初期化処理
+############################################################
+try:
+    initialize()
+except Exception as e:
+    logger.error(f"{ct.INITIALIZE_ERROR_MESSAGE}\n{e}")
+    st.error(utils.build_error_message(ct.INITIALIZE_ERROR_MESSAGE))
+    st.stop()
+
+# アプリ起動時のログ出力
+if not "initialized" in st.session_state:
+    st.session_state.initialized = True
+    logger.info(ct.APP_BOOT_MESSAGE)
+
+
+############################################################
 # 初期表示
-st.markdown(f"## {ct.APP_NAME}")
-with st.chat_message("assistant", avatar=ct.AI_ICON_FILE_PATH):
-    st.markdown("こちらは対話型の商品レコメンド生成AIアプリです。「こんな商品が欲しい」という情報・要望を画面下部のチャット欄から送信いただければ、おすすめの商品をレコメンドいたします。")
-    st.markdown("**入力例**")
-    st.info("""
-    - 「折り畳み傘」
-    - 「インテリアとしても使える芳香剤」
-    - 「長時間使える、高音質なワイヤレスイヤホン」
-    """)
+############################################################
+# タイトル表示
+cn.display_app_title()
 
-# 初期処理
-if "messages" not in st.session_state:
-    st.session_state.messages = []
+# 初期表示のAIメッセージ
+cn.display_initial_ai_message()
 
-# 再描画時にこれまでのメッセージ一覧を表示
-for message in st.session_state.messages:
-    if message["role"] == "user":
-        with st.chat_message("user", avatar=ct.USER_ICON_FILE_PATH):
-            st.markdown(message["content"])
-    else:
-        with st.chat_message("assistant", avatar=ct.AI_ICON_FILE_PATH):
-            product = message["content"]
-            ft.display_product(product)
 
-# ユーザー入力の受け付け
-input_message = st.chat_input("例： 防水機能のあるカメラ")
+############################################################
+# 会話ログの表示
+############################################################
+try:
+    cn.display_conversation_log()
+except Exception as e:
+    logger.error(f"{ct.CONVERSATION_LOG_ERROR_MESSAGE}\n{e}")
+    st.error(utils.build_error_message(ct.CONVERSATION_LOG_ERROR_MESSAGE))
+    st.stop()
 
-if input_message:
-    # ユーザーメッセージを表示
+
+############################################################
+# チャット入力の受け付け
+############################################################
+chat_message = st.chat_input(ct.CHAT_INPUT_HELPER_TEXT)
+
+
+############################################################
+# チャット送信時の処理
+############################################################
+if chat_message:
+    # ==========================================
+    # 1. ユーザーメッセージの処理
+    # ==========================================
+    logger.info({"message": chat_message})
+
     with st.chat_message("user", avatar=ct.USER_ICON_FILE_PATH):
-        st.markdown(input_message)
+        st.markdown(chat_message)
 
+    # ==========================================
+    # 2. LLMからの回答取得
+    # ==========================================
     res_box = st.empty()
-    with st.spinner('レコメンドする商品の検討中...'):
-        # レスポンスメッセージの取得・表示
-        with st.chat_message("assistant", avatar=ct.AI_ICON_FILE_PATH):
-            retriever = ft.create_retriever()
-            result = retriever.invoke(input_message)
-
-            # レスポンスのテキストを辞書に変換
-            product_lines = result[0].page_content.split("\n")
-            product = {item.split(": ")[0]: item.split(": ")[1] for item in product_lines}
-
-            # 商品の詳細情報を表示
-            ft.display_product(product)
+    with st.spinner(ct.SPINNER_TEXT):
+        try:
+            result = st.session_state.retriever.invoke(chat_message)
+        except Exception as e:
+            logger.error(f"{ct.RECOMMEND_ERROR_MESSAGE}\n{e}")
+            st.error(utils.build_error_message(ct.RECOMMEND_ERROR_MESSAGE))
+            st.stop()
+    
+    # ==========================================
+    # 3. LLMからの回答表示
+    # ==========================================
+    with st.chat_message("assistant", avatar=ct.AI_ICON_FILE_PATH):
+        try:
+            cn.display_product(result)
             
-    # メッセージ一覧に追加
-    st.session_state.messages.append({"role": "user", "content": input_message})
-    st.session_state.messages.append({"role": "assistant", "content": product})
+            logger.info({"message": result})
+        except Exception as e:
+            logger.error(f"{ct.LLM_RESPONSE_DISP_ERROR_MESSAGE}\n{e}")
+            st.error(utils.build_error_message(ct.LLM_RESPONSE_DISP_ERROR_MESSAGE))
+            st.stop()
+
+    # ==========================================
+    # 4. 会話ログへの追加
+    # ==========================================
+    st.session_state.messages.append({"role": "user", "content": chat_message})
+    st.session_state.messages.append({"role": "assistant", "content": result})
