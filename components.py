@@ -29,8 +29,8 @@ def display_initial_ai_message():
         st.markdown("こちらは対話型の商品レコメンド生成AIアプリです。「こんな商品が欲しい」という情報・要望を画面下部のチャット欄から送信いただければ、おすすめの商品をレコメンドいたします。")
         st.markdown("**入力例**")
         st.info("""
-        - 「折り畳み傘」
-        - 「インテリアとしても使える芳香剤」
+        - 「折りたたみ式のテーブル」
+        - 「USBで充電できる加湿器」
         - 「長時間使える、高音質なワイヤレスイヤホン」
         """)
 
@@ -68,6 +68,12 @@ def display_product(result):
             商品名：{product['name']}（商品ID: {product['id']}）\n
             価格：{product['price']}
     """)
+
+    # 在庫状況
+    if product["stock_status"] == ct.LOW_STOCK:
+        st.warning("ご好評につき、在庫数が残りわずかです。購入をご希望の場合、お早めのご注文をおすすめいたします。", icon=ct.WARNING_ICON)
+    elif product["stock_status"] == ct.NO_STOCK:
+        st.error("申し訳ございませんが、本商品は在庫切れとなっております。入荷までもうしばらくお待ちください。", icon=ct.ERROR_ICON)
 
     # 「商品カテゴリ」と「メーカー」と「ユーザー評価」
     st.code(f"""
